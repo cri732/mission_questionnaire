@@ -8,7 +8,7 @@ class Question:
         self.choix = choix
         self.bonne_reponse = bonne_reponse
 
-    def FromJsonData(data):
+    def from_json_data(data):
         # Définir les choix de réponses
         choix = [i[0] for i in data["choix"]]
         # Définir la bonne réponse
@@ -51,11 +51,29 @@ class Question:
 
 
 class Questionnaire:
-    def __init__(self, questions):
+    def __init__(self, questions, categorie, titre, difficulte):
         self.questions = questions
+        self.categorie = categorie
+        self.titre = titre
+        self.difficulte = difficulte
+
+    def from_json_data(data):
+        # Récupérer les questions
+        questionnaire_data_questions = data["questions"]
+        # Mise en forme des questions
+        questions = [Question.from_json_data(i) for i in questionnaire_data_questions]
+        return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
+
 
     def lancer(self):
         score = 0
+        # Afficher infos questionnaire
+        print("----------")
+        print(f"QUESTIONNAIRE: {self.titre}")
+        print(f"    Catégorie: {self.categorie}")
+        print(f"    Difficulté: {self.difficulte}")
+        print(f"    Nombre de questions: {len(self.questions)}")
+        print("----------")
         for question in self.questions:
             if question.poser():
                 score += 1
@@ -63,37 +81,22 @@ class Questionnaire:
         return score
 
 
-"""questionnaire = (
-    ("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
-    ("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-    ("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
-                )
+# -------------------- PHASE TESTS : UN SEUL QUESTIONNAIRE --------------------
+# # Tester première question
+# # Charger un fichier json
+# with open('animaux_leschats_debutant.json', "r", encoding="utf-8") as f:
+#     questionnaire_data = json.load(f)
+# # Récupérer les questions
+# questionnaire_data_questions = questionnaire_data["questions"]
+# # Mise en forme de la question
+# question = Question.from_json_data(questionnaire_data_questions[0])
+# # Poser une seule question
+# question.poser()
 
-lancer_questionnaire(questionnaire)
-
-# q1 = Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris")
-# q1.poser()
-
-# data = (("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris", "Quelle est la capitale de la France ?")
-# q = Question.FromData(data)
-# print(q.__dict__)"""
-
-
-# Questionnaire(
-#     (
-#     Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
-#     Question("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-#     Question("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
-#     )
-# ).lancer()
-
-
+# Tester lancement questionnaire
 # Charger un fichier json
 with open('animaux_leschats_debutant.json', "r", encoding="utf-8") as f:
     questionnaire_data = json.load(f)
-# Récupérer les questions
-questionnaire_data_questions = questionnaire_data["questions"]
-# Mise en forme de la question
-question = Question.FromJsonData(questionnaire_data_questions[0])
-# Poser une seule question
-question.poser()
+# Créer et lancer le questionnaire
+Questionnaire.from_json_data(questionnaire_data).lancer()
+print()
