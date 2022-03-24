@@ -1,5 +1,6 @@
 # Import de json pour charger les fichiers de questionnaires générés avec script import
 import json
+import sys
 
 
 class Question:
@@ -64,6 +65,16 @@ class Questionnaire:
         questions = [Question.from_json_data(i) for i in questionnaire_data_questions]
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
 
+    def from_json_file(filename):
+        try:
+            # Charger un fichier json
+            with open(filename, "r", encoding="utf-8") as f:
+                questionnaire_data = json.load(f)
+        except:
+            print("Erreur lors de l'ouverture ou la lecture du fichier")
+            return None
+        # Créer et lancer le questionnaire
+        return Questionnaire.from_json_data(questionnaire_data)
 
     def lancer(self):
         score = 0
@@ -83,6 +94,10 @@ class Questionnaire:
         return score
 
 
+# -------------------- PHASE PROD : TOUS LES QUESTIONNAIRES --------------------
+
+
+
 # -------------------- PHASE TESTS : UN SEUL QUESTIONNAIRE --------------------
 # # Tester première question
 # # Charger un fichier json
@@ -95,10 +110,20 @@ class Questionnaire:
 # # Poser une seule question
 # question.poser()
 
-# Tester lancement questionnaire
-# Charger un fichier json
-with open('animaux_leschats_debutant.json', "r", encoding="utf-8") as f:
-    questionnaire_data = json.load(f)
-# Créer et lancer le questionnaire
-Questionnaire.from_json_data(questionnaire_data).lancer()
-print()
+# Tester lancement questionnaire : Ancienne méthode
+# # Charger un fichier json
+# with open('animaux_leschats_debutant.json', "r", encoding="utf-8") as f:
+#     questionnaire_data = json.load(f)
+# # Créer et lancer le questionnaire
+# Questionnaire.from_json_data(questionnaire_data).lancer()
+# print()
+
+# Tester lancement questionnaire : Nouvelle méthode
+if len(sys.argv) < 2:
+    print("ERREUR: Vous devez spécifié le nom du fichier json à charger")
+    exit(0)
+
+json_filename = sys.argv[1]
+questionnaire = Questionnaire.from_json_file(json_filename)
+if questionnaire:
+    questionnaire.lancer()
