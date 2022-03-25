@@ -34,6 +34,7 @@ class Question:
             resultat_response_correcte = True
         else:
             print("Mauvaise réponse")
+            print(f"La bonne réponse était: {self.bonne_reponse}")
             
         print()
         return resultat_response_correcte
@@ -61,8 +62,10 @@ class Questionnaire:
     def from_json_data(data):
         # Récupérer les questions
         questionnaire_data_questions = data["questions"]
-        # Mise en forme des questions
+        # Mise en forme des questions : peut générer None (voir from_data_json class Question)
         questions = [Question.from_json_data(i) for i in questionnaire_data_questions]
+        # Suppression des questions None
+        questions = [i for i in questions if i]
         return Questionnaire(questions, data["categorie"], data["titre"], data["difficulte"])
 
     def from_json_file(filename):
@@ -73,7 +76,7 @@ class Questionnaire:
         except:
             print("Erreur lors de l'ouverture ou la lecture du fichier")
             return None
-        # Créer et lancer le questionnaire
+        # Créer le questionnaire
         return Questionnaire.from_json_data(questionnaire_data)
 
     def lancer(self):
@@ -95,7 +98,14 @@ class Questionnaire:
 
 
 # -------------------- PHASE PROD : TOUS LES QUESTIONNAIRES --------------------
+if len(sys.argv) < 2:
+    print("ERREUR: Vous devez spécifié le nom du fichier json à charger")
+    exit(0)
 
+json_filename = sys.argv[1]
+questionnaire = Questionnaire.from_json_file(json_filename)
+if questionnaire:
+    questionnaire.lancer()
 
 
 # -------------------- PHASE TESTS : UN SEUL QUESTIONNAIRE --------------------
@@ -117,13 +127,3 @@ class Questionnaire:
 # # Créer et lancer le questionnaire
 # Questionnaire.from_json_data(questionnaire_data).lancer()
 # print()
-
-# Tester lancement questionnaire : Nouvelle méthode
-if len(sys.argv) < 2:
-    print("ERREUR: Vous devez spécifié le nom du fichier json à charger")
-    exit(0)
-
-json_filename = sys.argv[1]
-questionnaire = Questionnaire.from_json_file(json_filename)
-if questionnaire:
-    questionnaire.lancer()

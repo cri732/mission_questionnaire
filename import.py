@@ -36,7 +36,7 @@ def generate_json_file(categorie, titre, url):
     try:
         response = requests.get(url)
     except:
-        print(f"Erreur dans le lien: {url}")
+        print(f"Erreur avec le lien: {url}")
     else:
         # Gestion si lien n'est pas fichier json
         try:
